@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, createContext, useContext } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
 import Login from './pages/Login'
@@ -15,13 +15,28 @@ import AdminMembers from './pages/admin/AdminMembers'
 import AdminContent from './pages/admin/AdminContent'
 import AdminRides from './pages/admin/AdminRides'
 
+export const ThemeContext = createContext({ theme: 'light', toggleTheme: () => {} })
+export const useTheme = () => useContext(ThemeContext)
+
 export default function App() {
   const [user, setUser] = useState(null)
+  const [theme, setTheme] = useState(() => localStorage.getItem('tr-theme') || 'light')
 
-  if (!user) return <Login onLogin={setUser} />
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('tr-theme', theme)
+  }, [theme])
 
-  if (user.role === 'admin') {
-    return (
+  const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light')
+
+  if (!user) return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      <Login onLogin={setUser} />
+    </ThemeContext.Provider>
+  )
+
+  if (user.role === 'admin') return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
       <BrowserRouter>
         <AdminLayout user={user} onLogout={() => setUser(null)}>
           <Routes>
@@ -34,23 +49,25 @@ export default function App() {
           </Routes>
         </AdminLayout>
       </BrowserRouter>
-    )
-  }
+    </ThemeContext.Provider>
+  )
 
   return (
-    <BrowserRouter>
-      <Layout user={user} onLogout={() => setUser(null)}>
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Dashboard user={user} />} />
-          <Route path="/carpooling" element={<Carpooling user={user} />} />
-          <Route path="/rides" element={<MyRides user={user} />} />
-          <Route path="/activities" element={<Activities />} />
-          <Route path="/schedule" element={<Schedule />} />
-          <Route path="/profile" element={<Profile user={user} setUser={setUser} />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      <BrowserRouter>
+        <Layout user={user} onLogout={() => setUser(null)}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard user={user} />} />
+            <Route path="/carpooling" element={<Carpooling user={user} />} />
+            <Route path="/rides" element={<MyRides user={user} />} />
+            <Route path="/activities" element={<Activities />} />
+            <Route path="/schedule" element={<Schedule />} />
+            <Route path="/profile" element={<Profile user={user} setUser={setUser} />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </Layout>
+      </BrowserRouter>
+    </ThemeContext.Provider>
   )
 }
