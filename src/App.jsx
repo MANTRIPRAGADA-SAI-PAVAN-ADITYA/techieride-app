@@ -1,25 +1,44 @@
 import { useState, useEffect, createContext, useContext } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
-import Login from './pages/Login'
-import Layout from './components/Layout'
-import AdminLayout from './components/AdminLayout'
-import Dashboard from './pages/Dashboard'
-import Carpooling from './pages/Carpooling'
-import MyRides from './pages/MyRides'
-import Activities from './pages/Activities'
-import Profile from './pages/Profile'
-import Schedule from './pages/Schedule'
-import AdminPanel from './pages/admin/AdminPanel'
-import AdminMembers from './pages/admin/AdminMembers'
-import AdminContent from './pages/admin/AdminContent'
-import AdminRides from './pages/admin/AdminRides'
 
+// Layouts
+import PublicLayout  from './components/PublicLayout'
+import MemberLayout  from './components/MemberLayout'
+import AdminLayout   from './components/AdminLayout'
+
+// Public pages
+import Landing  from './pages/public/Landing'
+import Register from './pages/public/Register'
+import Donate   from './pages/public/Donate'
+import PublicActivities from './pages/public/PublicActivities'
+
+// Member pages
+import Dashboard   from './pages/member/Dashboard'
+import Carpooling  from './pages/member/Carpooling'
+import MyPools     from './pages/member/MyPools'
+import Activities  from './pages/member/Activities'
+import Profile     from './pages/member/Profile'
+import Schedule    from './pages/Schedule'
+
+// Admin pages
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminMembers   from './pages/admin/AdminMembers'
+import AdminRides     from './pages/admin/AdminRides'
+import AdminContent   from './pages/admin/AdminContent'
+import AdminDonate    from './pages/admin/AdminDonate'
+
+// Auth
+import Login from './pages/Login'
+
+/* ─── THEME CONTEXT ─────────────────────────────────── */
 export const ThemeContext = createContext({ theme: 'light', toggleTheme: () => {} })
 export const useTheme = () => useContext(ThemeContext)
 
+/* ─── APP ────────────────────────────────────────────── */
 export default function App() {
-  const [user, setUser] = useState(null)
+  const [user,  setUser]  = useState(null)
+  const [mode,  setMode]  = useState('visitor') // visitor | member | admin
   const [theme, setTheme] = useState(() => localStorage.getItem('tr-theme') || 'light')
 
   useEffect(() => {
@@ -29,44 +48,64 @@ export default function App() {
 
   const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light')
 
-  if (!user) return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <Login onLogin={setUser} />
-    </ThemeContext.Provider>
-  )
-
-  if (user.role === 'admin') return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <BrowserRouter>
-        <AdminLayout user={user} onLogout={() => setUser(null)}>
-          <Routes>
-            <Route path="/" element={<Navigate to="/admin" replace />} />
-            <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/admin/members" element={<AdminMembers />} />
-            <Route path="/admin/content" element={<AdminContent />} />
-            <Route path="/admin/rides" element={<AdminRides />} />
-            <Route path="*" element={<Navigate to="/admin" replace />} />
-          </Routes>
-        </AdminLayout>
-      </BrowserRouter>
-    </ThemeContext.Provider>
-  )
+  const handleLogin = (u) => {
+    setUser(u)
+    setMode(u.role === 'admin' ? 'admin' : 'member')
+  }
+  const handleLogout = () => { setUser(null); setMode('visitor') }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       <BrowserRouter>
-        <Layout user={user} onLogout={() => setUser(null)}>
-          <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard user={user} />} />
-            <Route path="/carpooling" element={<Carpooling user={user} />} />
-            <Route path="/rides" element={<MyRides user={user} />} />
-            <Route path="/activities" element={<Activities />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/profile" element={<Profile user={user} setUser={setUser} />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </Layout>
+        {/* ── VISITOR (public) ── */}
+        {mode === 'visitor' && (
+          <PublicLayout onLoginClick={() => setMode('login')}>
+            <Routes>
+              <Route path="/"           element={<Landing  onLoginClick={() => setMode('login')} />} />
+              <Route path="/activities" element={<PublicActivities />} />
+              <Route path="/register"   element={<Register />} />
+              <Route path="/donate"     element={<Donate />} />
+              <Route path="*"           element={<Navigate to="/" replace />} />
+            </Routes>
+          </PublicLayout>
+        )}
+
+        {/* ── LOGIN ── */}
+        {mode === 'login' && (
+          <Login onLogin={handleLogin} onBack={() => setMode('visitor')} />
+        )}
+
+        {/* ── MEMBER ── */}
+        {mode === 'member' && user && (
+          <MemberLayout user={user} onLogout={handleLogout}>
+            <Routes>
+              <Route path="/"             element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard"    element={<Dashboard   user={user} />} />
+              <Route path="/carpooling"   element={<Carpooling  user={user} />} />
+              <Route path="/my-pools"     element={<MyPools     user={user} />} />
+              <Route path="/activities"   element={<Activities  user={user} />} />
+              <Route path="/donate"       element={<Donate member />} />
+              <Route path="/schedule"     element={<Schedule />} />
+              <Route path="/profile"      element={<Profile user={user} setUser={setUser} />} />
+              <Route path="*"             element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </MemberLayout>
+        )}
+
+        {/* ── ADMIN ── */}
+        {mode === 'admin' && user && (
+          <AdminLayout user={user} onLogout={handleLogout}>
+            <Routes>
+              <Route path="/"                element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/members"   element={<AdminMembers />} />
+              <Route path="/admin/rides"     element={<AdminRides />} />
+              <Route path="/admin/content"   element={<AdminContent />} />
+              <Route path="/admin/donate"    element={<AdminDonate />} />
+              <Route path="*"                element={<Navigate to="/admin/dashboard" replace />} />
+            </Routes>
+          </AdminLayout>
+        )}
       </BrowserRouter>
     </ThemeContext.Provider>
   )
