@@ -1,0 +1,19 @@
+{
+  "appId": "in.techieride.app",
+  "appName": "TechieRide",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#14a1af",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "LIGHT",
+      "backgroundColor": "#0d3c55"
+    }
+  }
+}
