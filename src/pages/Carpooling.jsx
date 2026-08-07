@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Car, MapPin, Clock, Users, Search, Plus, Phone, ChevronDown, ChevronUp, Check, Leaf, UserPlus, RefreshCw, CalendarDays, Info, ArrowRight } from 'lucide-react'
+import { Car, MapPin, Clock, Users, Search, Plus, Phone, ChevronDown, ChevronUp, Check, Leaf, UserPlus, RefreshCw, CalendarDays, Info, ArrowRight, Share2 } from 'lucide-react'
 import { rides as initialRides, rideRequests as initialRideRequests } from '../data/mockData'
 
 const HYD_AREAS = ['Hitech City','Gachibowli','Kondapur','Madhapur','Jubilee Hills','Banjara Hills','Ameerpet','Secunderabad','KPHB','Kukatpally','LB Nagar','Uppal','Dilsukhnagar','Mehdipatnam','Tolichowki','Miyapur','Patancheru','Begumpet','Nampally','Abids','Kukatpally','Manikonda','Narsingi']
@@ -93,6 +93,13 @@ function RideCard({ ride, user, onRequest }) {
               <Leaf size={12} color="#15803d"/>
               <span style={{ fontSize:'11px', color:'#15803d', fontWeight:'700' }}>~3 kg CO₂ saved</span>
             </div>
+            {'share' in navigator && (
+              <button
+                onClick={() => navigator.share({ title: 'TechieRide Carpool', text: `Join ${ride.riderName}'s ride: ${ride.origin} → ${ride.destination} on ${ride.date} at ${ride.time}. ${ride.seatsTotal - ride.seatsFilled} seats left.`, url: window.location.href })}
+                style={{ padding:'9px 12px', borderRadius:'10px', background:'var(--bg)', border:'1.5px solid var(--border)', color:'var(--text-muted)', fontSize:'13px', fontWeight:'700', cursor:'pointer', display:'flex', alignItems:'center', gap:'5px' }}>
+                <Share2 size={13}/> Share
+              </button>
+            )}
           </div>
         </div>
       )}

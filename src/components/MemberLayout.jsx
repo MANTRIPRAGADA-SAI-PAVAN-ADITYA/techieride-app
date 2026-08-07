@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Car, History, Heart, User, LogOut, Bell, Menu, ChevronRight, Sun, Moon, DollarSign, Calendar } from 'lucide-react'
-import { useTheme } from '../App'
+import { LayoutDashboard, Car, History, Heart, User, LogOut, Bell, Menu, ChevronRight, Sun, Moon, DollarSign, Shield, X } from 'lucide-react'
+import { useTheme, NotificationContext } from '../App'
+import { formatNotifTime } from '../utils/notifications'
 
 export default function MemberLayout({ children, user, onLogout }) {
   const location = useLocation()
@@ -9,23 +10,18 @@ export default function MemberLayout({ children, user, onLogout }) {
   const { theme, toggleTheme } = useTheme()
   const [collapsed, setCollapsed] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
+  const { notifications, markAllRead } = useContext(NotificationContext)
+  const unread = notifications.filter(n => n.unread).length
 
-  // Role-based navigation
   const nav = [
-    { path: '/dashboard',  label: 'My Dashboard', icon: LayoutDashboard, roles: ['all'] },
-    { path: '/carpooling', label: 'Carpooling',    icon: Car,             roles: ['all'] },
-    { path: '/my-pools',   label: 'My Pools',      icon: History,         roles: ['all'] },
-    { path: '/activities', label: 'NGO Activities',icon: Heart,           roles: ['all'] },
-    { path: '/donate',     label: 'Donate',        icon: DollarSign,      roles: ['all'] },
-    { path: '/profile',    label: 'My Profile',    icon: User,            roles: ['all'] },
+    { path: '/dashboard',  label: 'My Dashboard',   icon: LayoutDashboard },
+    { path: '/carpooling', label: 'Carpooling',      icon: Car },
+    { path: '/my-pools',   label: 'My Pools',        icon: History },
+    { path: '/activities', label: 'NGO Activities',  icon: Heart },
+    { path: '/donate',     label: 'Donate',          icon: DollarSign },
+    { path: '/profile',    label: 'My Profile',      icon: User },
+    ...(user?.isModerator ? [{ path: '/moderator', label: 'Moderator', icon: Shield }] : []),
   ]
-
-  const notifs = [
-    { id: 1, text: 'Vikram posted a new ride: Gachibowli → LB Nagar', time: '10m ago', unread: true },
-    { id: 2, text: 'Village Ride this Sunday — drivers needed!', time: '3h ago', unread: false },
-  ]
-
-  const roleLabel = user.isRider && user.isSeekerActive ? 'Rider & Seeker' : user.isRider ? 'Rider' : user.isSeekerActive ? 'Seeker' : 'Member'
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)' }}>
@@ -56,7 +52,8 @@ export default function MemberLayout({ children, user, onLogout }) {
             <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
               {user.isRider && <span className="tag tag-blue" style={{ fontSize: '9px', padding: '2px 7px' }}>🚗 Rider</span>}
               {user.isSeekerActive && <span className="tag tag-green" style={{ fontSize: '9px', padding: '2px 7px' }}>🔍 Seeker</span>}
-              {!user.isRider && !user.isSeekerActive && <span className="tag tag-amber" style={{ fontSize: '9px', padding: '2px 7px' }}>Member</span>}
+              {user.isModerator && <span className="tag tag-amber" style={{ fontSize: '9px', padding: '2px 7px' }}>🛡️ Mod</span>}
+              {!user.isRider && !user.isSeekerActive && !user.isModerator && <span className="tag tag-amber" style={{ fontSize: '9px', padding: '2px 7px' }}>Member</span>}
             </div>
           </div>
         )}
@@ -67,7 +64,7 @@ export default function MemberLayout({ children, user, onLogout }) {
               className={`sidebar-link ${location.pathname === path ? 'active' : ''}`}
               onClick={() => navigate(path)}
               title={collapsed ? label : ''}
-              style={{ justifyContent: collapsed ? 'center' : 'flex-start' }}>
+              style={{ justifyContent: collapsed ? 'center' : 'flex-start', ...(path === '/moderator' && location.pathname !== '/moderator' ? { color: '#b45309' } : {}) }}>
               <Icon size={16} style={{ flexShrink: 0 }} />
               {!collapsed && <span>{label}</span>}
               {!collapsed && location.pathname === path && <ChevronRight size={12} style={{ marginLeft: 'auto', opacity: 0.4 }} />}
@@ -99,24 +96,43 @@ export default function MemberLayout({ children, user, onLogout }) {
             {theme === 'light' ? <Moon size={13} /> : <Sun size={13} color="#fbbf24" />}
             {theme === 'light' ? 'Dark' : 'Light'}
           </button>
+
+          {/* Notification bell */}
           <div style={{ position: 'relative' }}>
-            <button onClick={() => setNotifOpen(!notifOpen)}
+            <button onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) markAllRead() }}
               style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '8px', padding: '7px', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', position: 'relative' }}>
               <Bell size={16} />
-              <div style={{ position: 'absolute', top: '4px', right: '4px', width: '7px', height: '7px', background: 'var(--primary)', borderRadius: '50%', border: '1.5px solid var(--surface)' }} />
+              {unread > 0 && (
+                <div style={{ position: 'absolute', top: '3px', right: '3px', width: '16px', height: '16px', background: 'var(--primary)', borderRadius: '50%', border: '1.5px solid var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', fontWeight: '800', color: 'white' }}>
+                  {unread > 9 ? '9+' : unread}
+                </div>
+              )}
             </button>
             {notifOpen && (
-              <div className="card" style={{ position: 'absolute', top: '44px', right: 0, width: '280px', borderRadius: '13px', padding: '12px', zIndex: 100, boxShadow: 'var(--shadow-md)' }}>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Notifications</div>
-                {notifs.map(n => (
-                  <div key={n.id} style={{ padding: '9px 10px', borderRadius: '8px', background: n.unread ? 'var(--primary-light)' : 'transparent', marginBottom: '3px', borderLeft: n.unread ? '2.5px solid var(--primary)' : '2.5px solid transparent' }}>
-                    <div style={{ fontSize: '12.5px', color: 'var(--text)', marginBottom: '2px' }}>{n.text}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{n.time}</div>
+              <div className="card" style={{ position: 'absolute', top: '46px', right: 0, width: '300px', borderRadius: '14px', padding: '14px', zIndex: 200, boxShadow: 'var(--shadow-md)', maxHeight: '360px', overflowY: 'auto' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Notifications</div>
+                  <button onClick={() => setNotifOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={14} /></button>
+                </div>
+                {notifications.length === 0 && (
+                  <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>No notifications yet</div>
+                )}
+                {notifications.map(n => (
+                  <div key={n.id} style={{ padding: '10px 11px', borderRadius: '9px', background: n.unread ? 'var(--primary-light)' : 'transparent', marginBottom: '4px', borderLeft: n.unread ? '2.5px solid var(--primary)' : '2.5px solid transparent' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '7px' }}>
+                      <span style={{ fontSize: '15px', flexShrink: 0 }}>{n.icon || '🔔'}</span>
+                      <div>
+                        <div style={{ fontSize: '12.5px', fontWeight: '700', color: 'var(--text)' }}>{n.title}</div>
+                        {n.body && <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '2px' }}>{n.body}</div>}
+                        <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', marginTop: '4px' }}>{formatNotifTime(n.time)}</div>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
           </div>
+
           <div className="primary-gradient" onClick={() => navigate('/profile')}
             style={{ width: '34px', height: '34px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '800', color: 'white', cursor: 'pointer', flexShrink: 0 }}>
             {user.avatar}

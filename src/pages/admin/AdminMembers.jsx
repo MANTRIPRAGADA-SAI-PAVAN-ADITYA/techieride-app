@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { members as initialMembers, pendingRequests as initialPending, activities, rides, participations, generateTRId, exportCSV } from '../../data/mockData'
-import { Plus, Search, UserCheck, UserX, Car, Eye, X, Check, Download, ChevronDown, ChevronUp, Heart, Clock, AlertCircle, CheckCircle, XCircle, Phone, Mail, MapPin, Users } from 'lucide-react'
+import { Plus, Search, UserCheck, UserX, Car, Eye, X, Check, Download, ChevronDown, ChevronUp, Heart, Clock, AlertCircle, CheckCircle, XCircle, Phone, Mail, MapPin, Users, Shield, ShieldOff } from 'lucide-react'
 
 const inp = { width:'100%', background:'var(--bg)', border:'1.5px solid var(--border)', borderRadius:'10px', padding:'10px 13px', color:'var(--text)', fontSize:'13px', boxSizing:'border-box', fontFamily:'inherit', outline:'none' }
 const lbl = (txt) => <label style={{ display:'block', fontSize:'11px', color:'var(--text-muted)', marginBottom:'5px', fontWeight:'700', letterSpacing:'0.4px', textTransform:'uppercase' }}>{txt}</label>
@@ -139,6 +139,7 @@ export default function AdminMembers() {
   })
 
   const toggleStatus = (id) => setMembers(prev => prev.map(m => m.id===id ? {...m, status: m.status==='active'?'inactive':'active'} : m))
+  const toggleModerator = (id) => setMembers(prev => prev.map(m => m.id===id ? {...m, isModerator: !m.isModerator} : m))
 
   const approvePending = (req) => {
     const newId = generateTRId(members.map(m=>m.id))
@@ -172,9 +173,10 @@ export default function AdminMembers() {
     { id:'active',   label:`Active (${members.filter(m=>m.status==='active').length})` },
     { id:'inactive', label:`Inactive (${members.filter(m=>m.status==='inactive').length})` },
     { id:'pending',  label:`Pending Approval (${pending.length})`, alert: pending.length > 0 },
+    { id:'moderators', label:`Moderators (${members.filter(m=>m.isModerator).length})` },
   ]
 
-  const displayList = tab==='pending' ? filteredPending : byStatus(tab)
+  const displayList = tab==='pending' ? filteredPending : tab==='moderators' ? members.filter(m=>m.isModerator) : byStatus(tab)
 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:'20px' }}>
@@ -255,10 +257,10 @@ export default function AdminMembers() {
         </div>
       )}
 
-      {/* ACTIVE / INACTIVE TAB — table */}
+      {/* ACTIVE / INACTIVE / MODERATORS TAB — table */}
       {tab !== 'pending' && (
         <div className="card" style={{ borderRadius:'16px', overflow:'hidden' }}>
-          <div style={{ display:'grid', gridTemplateColumns:'110px 1fr 85px 110px 85px 90px 80px', gap:0, padding:'10px 16px', background:'var(--bg)', borderBottom:'1.5px solid var(--border)' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'110px 1fr 85px 110px 85px 90px 110px', gap:0, padding:'10px 16px', background:'var(--bg)', borderBottom:'1.5px solid var(--border)' }}>
             {['TR ID','Name / Area','Phone','Referred By','Joined','Role','Actions'].map(h => (
               <div key={h} style={{ fontSize:'10px', fontWeight:'700', color:'var(--text-muted)', letterSpacing:'0.5px', textTransform:'uppercase' }}>{h}</div>
             ))}
@@ -266,7 +268,7 @@ export default function AdminMembers() {
           {displayList.length===0 && <div style={{ padding:'32px', textAlign:'center', color:'var(--text-muted)', fontSize:'13px' }}>No members found</div>}
           {displayList.map((m,i) => (
             <div key={m.id}
-              style={{ display:'grid', gridTemplateColumns:'110px 1fr 85px 110px 85px 90px 80px', gap:0, padding:'11px 16px', borderBottom: i<displayList.length-1?'1.5px solid var(--border-soft)':'none', alignItems:'center', background:'transparent', transition:'background 0.15s', cursor:'default' }}
+              style={{ display:'grid', gridTemplateColumns:'110px 1fr 85px 110px 85px 90px 110px', gap:0, padding:'11px 16px', borderBottom: i<displayList.length-1?'1.5px solid var(--border-soft)':'none', alignItems:'center', background:'transparent', transition:'background 0.15s', cursor:'default' }}
               onMouseEnter={e=>e.currentTarget.style.background='var(--bg)'}
               onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
               <div style={{ fontFamily:'monospace', fontSize:'12px', fontWeight:'800', color:'var(--primary)' }}>{m.id}</div>
@@ -282,12 +284,16 @@ export default function AdminMembers() {
                 {m.isSeekerActive && <span className="tag tag-green" style={{ fontSize:'9px', padding:'2px 6px' }}>Seeker</span>}
                 {!m.isRider && !m.isSeekerActive && <span className="tag tag-amber" style={{ fontSize:'9px', padding:'2px 6px' }}>Member</span>}
               </div>
-              <div style={{ display:'flex', gap:'5px' }}>
+              <div style={{ display:'flex', gap:'4px' }}>
                 <button onClick={()=>setViewMember(m)} title="View full details"
                   style={{ padding:'5px 7px', borderRadius:'7px', background:'var(--primary-light)', border:'1.5px solid rgba(20,161,175,0.2)', color:'var(--primary)', cursor:'pointer' }}><Eye size={12}/></button>
                 <button onClick={()=>toggleStatus(m.id)} title={m.status==='active'?'Deactivate':'Activate'}
                   style={{ padding:'5px 7px', borderRadius:'7px', background: m.status==='active'?'rgba(239,68,68,0.08)':'rgba(34,197,94,0.1)', border: m.status==='active'?'1.5px solid rgba(239,68,68,0.2)':'1.5px solid rgba(34,197,94,0.3)', color: m.status==='active'?'#b91c1c':'#15803d', cursor:'pointer' }}>
                   {m.status==='active'?<UserX size={12}/>:<UserCheck size={12}/>}
+                </button>
+                <button onClick={()=>toggleModerator(m.id)} title={m.isModerator?'Remove Moderator':'Promote to Moderator'}
+                  style={{ padding:'5px 7px', borderRadius:'7px', background: m.isModerator?'rgba(245,158,11,0.12)':'var(--bg)', border: m.isModerator?'1.5px solid rgba(245,158,11,0.35)':'1.5px solid var(--border)', color: m.isModerator?'#b45309':'var(--text-muted)', cursor:'pointer' }}>
+                  {m.isModerator?<ShieldOff size={12}/>:<Shield size={12}/>}
                 </button>
               </div>
             </div>

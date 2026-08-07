@@ -3,9 +3,9 @@ import { Car, User, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, Info, Shield, Sun,
 import { useTheme } from '../App'
 
 const DEMO = [
-  { id: 'TR1001', name: 'Rajesh Kumar', role: 'member', area: 'Kondapur',   avatar: 'RK', isRider: true,  isSeekerActive: false },
-  { id: 'TR1003', name: 'Vikram Singh', role: 'member', area: 'Gachibowli', avatar: 'VS', isRider: true,  isSeekerActive: true  },
-  { id: 'TR1002', name: 'Priya Mehta',  role: 'member', area: 'Madhapur',   avatar: 'PM', isRider: false, isSeekerActive: true  },
+  { id: 'TR1001', name: 'Rajesh Kumar', role: 'member', area: 'Kondapur',   avatar: 'RK', isRider: true,  isSeekerActive: false, isModerator: true  },
+  { id: 'TR1003', name: 'Vikram Singh', role: 'member', area: 'Gachibowli', avatar: 'VS', isRider: true,  isSeekerActive: true,  isModerator: false },
+  { id: 'TR1002', name: 'Priya Mehta',  role: 'member', area: 'Madhapur',   avatar: 'PM', isRider: false, isSeekerActive: true,  isModerator: false },
 ]
 
 export default function Login({ onLogin, onBack }) {
