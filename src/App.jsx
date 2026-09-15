@@ -12,6 +12,7 @@ import Landing          from './pages/public/Landing'
 import Register         from './pages/public/Register'
 import Donate           from './pages/public/Donate'
 import PublicActivities from './pages/public/PublicActivities'
+import DataRoadmap      from './pages/public/DataRoadmap'
 
 // Member pages
 import Dashboard   from './pages/member/Dashboard'
@@ -149,6 +150,7 @@ export default function App() {
               <Routes>
                 <Route path="/"           element={<Landing onLoginClick={() => setMode('login')} />} />
                 <Route path="/activities" element={<PublicActivities />} />
+                <Route path="/roadmap"    element={<DataRoadmap />} />
                 <Route path="/register"   element={<Register />} />
                 <Route path="/donate"     element={<Donate />} />
                 <Route path="*"           element={<Navigate to="/" replace />} />
