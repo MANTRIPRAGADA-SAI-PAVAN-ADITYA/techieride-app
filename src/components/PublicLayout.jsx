@@ -12,8 +12,7 @@ export default function PublicLayout({ children, onLoginClick }) {
   const links = [
     { path: '/',           label: 'Home' },
     { path: '/activities', label: 'Our Activities' },
-    { path: '/roadmap',    label: '📊 Data Roadmap' },
-    { path: '/donate',     label: 'Donate' },
+{ path: '/donate',     label: 'Donate' },
     { path: '/register',   label: 'Join Us' },
   ]
 
