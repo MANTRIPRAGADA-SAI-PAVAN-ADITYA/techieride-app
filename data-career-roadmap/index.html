@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Career Roadmap</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #14a1af;
+      --primary-dark: #0d7a86;
+      --navy: #0d3c55;
+      --bg: #f0f9fb;
+      --surface: #ffffff;
+      --border: #c8e8ed;
+      --text: #0d2b36;
+      --text2: #2e6275;
+      --muted: #5a8595;
+      --shadow: 0 2px 14px rgba(20,161,175,0.1);
+      --shadow-md: 0 6px 24px rgba(20,161,175,0.14);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #0d3c55 0%, #14a1af 100%);
+      padding: 56px 24px 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 30%, rgba(255,255,255,0.04) 0%, transparent 60%);
+    }
+    .hero-inner { max-width: 680px; margin: 0 auto; position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 14px; border-radius: 20px;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+      margin-bottom: 20px;
+      font-size: 12px; color: rgba(255,255,255,0.9); font-weight: 600;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 42px); font-weight: 900;
+      color: white; line-height: 1.1; letter-spacing: -0.8px; margin-bottom: 14px;
+    }
+    .hero p { font-size: 16px; color: rgba(255,255,255,0.82); line-height: 1.6; margin-bottom: 8px; }
+    .hero small { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex; gap: 28px; justify-content: center; flex-wrap: wrap;
+    }
+    .stat-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text2); font-weight: 600; }
+
+    /* ── MAIN CONTENT ── */
+    .main { max-width: 960px; margin: 0 auto; padding: 40px 20px 64px; }
+
+    /* ── ROLE GRID ── */
+    #role-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+    .role-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 20px;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+      box-shadow: var(--shadow);
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .role-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    .role-header { display: flex; align-items: center; gap: 12px; }
+    .role-emoji { font-size: 34px; line-height: 1; }
+    .role-title { font-size: 16px; font-weight: 800; line-height: 1.1; }
+    .role-tagline { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .role-desc { font-size: 12.5px; color: var(--text2); line-height: 1.6; }
+    .role-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+    .role-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip {
+      font-size: 11px; padding: 3px 9px; border-radius: 20px;
+      font-weight: 700; border: 1px solid;
+    }
+    .chip-color { background: var(--chip-bg); color: var(--chip-c); border-color: var(--chip-bc); }
+    .chip-grey { background: #f0f9fb; color: var(--muted); border-color: var(--border); }
+    .role-cta { font-size: 12.5px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+
+    /* ── SECTION HEADER ── */
+    .section-header { text-align: center; margin-bottom: 32px; }
+    .section-header h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .section-header p { font-size: 14px; color: var(--muted); }
+
+    /* ── ROLE DETAIL ── */
+    #detail { display: none; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 9px;
+      background: var(--surface); border: 1.5px solid var(--border);
+      color: var(--muted); font-size: 13px; font-weight: 600;
+      cursor: pointer; margin-bottom: 24px;
+      transition: all 0.15s; font-family: inherit;
+    }
+    .back-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+    .detail-header {
+      border-radius: 20px; padding: 28px;
+      margin-bottom: 28px; border: 2px solid;
+    }
+    .detail-top { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+    .detail-emoji { font-size: 48px; line-height: 1; }
+    .detail-info { flex: 1; min-width: 200px; }
+    .detail-title { font-size: 26px; font-weight: 900; line-height: 1.1; margin-bottom: 4px; }
+    .detail-tagline { font-size: 14px; color: var(--text2); margin-bottom: 12px; }
+    .detail-desc { font-size: 14px; color: var(--text2); line-height: 1.65; margin-bottom: 16px; }
+    .detail-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+    .detail-stat {
+      padding: 8px 14px; border-radius: 10px;
+      background: var(--surface); border: 1.5px solid var(--border);
+    }
+    .detail-stat-label { font-size: 10.5px; color: var(--muted); font-weight: 600; margin-bottom: 2px; }
+    .detail-stat-value { font-size: 13px; font-weight: 800; }
+
+    /* ── PHASES ── */
+    .phase-section { margin-bottom: 20px; }
+    .phase-toggle {
+      width: 100%; display: flex; align-items: center; gap: 14px;
+      padding: 16px 20px; border-radius: 14px;
+      background: var(--surface); border: 2px solid var(--border);
+      cursor: pointer; text-align: left; transition: all 0.2s;
+      box-shadow: var(--shadow); font-family: inherit;
+    }
+    .phase-toggle.open { box-shadow: var(--shadow-md); }
+    .phase-icon { font-size: 22px; }
+    .phase-meta { flex: 1; }
+    .phase-name-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .phase-name { font-size: 15.5px; font-weight: 800; }
+    .phase-duration {
+      padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+      border: 1px solid;
+    }
+    .phase-sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+    .phase-chevron { font-size: 16px; flex-shrink: 0; }
+
+    .phase-body {
+      margin-top: 10px;
+      padding-left: 12px;
+      border-left: 3px solid;
+      display: none;
+    }
+    .phase-body.open { display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── TOPIC CARDS ── */
+    .topic-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-shadow: var(--shadow);
+    }
+    .topic-toggle {
+      width: 100%; padding: 16px 18px; display: flex; align-items: center; gap: 12px;
+      background: var(--surface); border: none; cursor: pointer; text-align: left;
+      font-family: inherit; transition: background 0.18s;
+    }
+    .topic-num {
+      width: 28px; height: 28px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; flex-shrink: 0;
+    }
+    .topic-title { flex: 1; font-size: 14.5px; font-weight: 700; color: var(--text); }
+    .topic-chevron { font-size: 14px; flex-shrink: 0; }
+
+    .topic-body {
+      padding: 0 18px 18px; border-top: 1px solid var(--border); display: none;
+    }
+    .topic-body.open { display: block; }
+
+    .why-box {
+      padding: 12px 14px; border-radius: 10px; margin: 14px 0;
+    }
+    .why-label { font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 5px; }
+    .why-text { font-size: 13.5px; color: var(--text2); line-height: 1.65; }
+
+    .topic-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .topic-col-title {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11.5px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.4px; color: var(--text); margin-bottom: 8px;
+    }
+    .topic-col-title svg { flex-shrink: 0; }
+    .item-row { display: flex; align-items: flex-start; gap: 7px; margin-bottom: 5px; }
+    .item-dot { flex-shrink: 0; margin-top: 3px; font-size: 10px; }
+    .item-text { font-size: 12.5px; color: var(--text2); line-height: 1.5; }
+    .tool-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tool-tag {
+      padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 700;
+      border: 1px solid;
+    }
+
+    /* ── TOOLS & TIPS CARDS ── */
+    .info-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; box-shadow: var(--shadow);
+      padding: 22px 24px; margin-bottom: 20px;
+    }
+    .info-card-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 15px; font-weight: 800; margin-bottom: 14px;
+    }
+    .tools-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tips-list { display: flex; flex-direction: column; gap: 10px; }
+    .tip-row { display: flex; align-items: flex-start; gap: 10px; }
+    .tip-num {
+      width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0; margin-top: 1px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800;
+    }
+    .tip-text { font-size: 13.5px; color: var(--text2); line-height: 1.6; }
+
+    /* ── CALLOUT ── */
+    .callout {
+      margin-top: 48px; padding: 24px 28px; text-align: center;
+      background: linear-gradient(135deg, rgba(13,122,134,0.08), rgba(20,161,175,0.05));
+      border: 1.5px solid var(--border); border-radius: 16px;
+    }
+    .callout-emoji { font-size: 22px; margin-bottom: 8px; }
+    .callout h3 { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+    .callout p { font-size: 13.5px; color: var(--text2); line-height: 1.7; max-width: 560px; margin: 0 auto; }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 18px; font-weight: 800; margin-bottom: 16px;
+    }
+
+    @media (max-width: 480px) {
+      #role-grid { grid-template-columns: 1fr; }
+      .detail-top { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">⭐ Free · No sign-up · Updated 2025</div>
+    <h1>Data Career Roadmap</h1>
+    <p>Pick your target role. Get a step-by-step learning path — skills, tools, free resources, and interview tips.</p>
+    <small>Designed for MSc/BSc graduates who know the theory but want a practical path to employment.</small>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item">🎯 6 career paths</div>
+  <div class="stat-item">📚 30+ curated free resources</div>
+  <div class="stat-item">⏱️ Realistic timelines</div>
+  <div class="stat-item">💼 Interview tips included</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- GRID VIEW -->
+  <div id="grid-view">
+    <div class="section-header">
+      <h2>Choose Your Target Role</h2>
+      <p>Not sure? Start with <strong>Data Analyst</strong> or <strong>BI Analyst</strong> — shortest path to employment.</p>
+    </div>
+    <div id="role-grid"></div>
+    <div class="callout">
+      <div class="callout-emoji">💡</div>
+      <h3>Quick tip for MSc graduates</h3>
+      <p>You already have the theory. The gap is <strong>practical, applied projects on GitHub</strong>. Pick one role, build 2–3 real end-to-end projects, and start applying. Most employers care more about what you've <em>built</em> than where you studied.</p>
+    </div>
+  </div>
+
+  <!-- DETAIL VIEW -->
+  <div id="detail">
+    <button class="back-btn" onclick="showGrid()">← Back to all roles</button>
+    <div id="detail-content"></div>
+  </div>
+
+</div>
+
+<script>
+const ROLES = [
+  {
+    id: 'analyst', emoji: '📊', title: 'Data Analyst',
+    tagline: 'Turn raw data into business insights',
+    color: '#0d7a86', bg: 'rgba(13,122,134,0.08)', border: 'rgba(13,122,134,0.3)',
+    timeline: '4–6 months', demand: 'Very High', demandColor: '#15803d', salary: '₹4–10 LPA',
+    desc: 'Data Analysts collect, clean, and interpret datasets to help organizations make better decisions. Perfect starting point for an MSc Data Science graduate.',
+    phases: [
+      { name: 'Foundations', duration: '4–6 weeks', icon: '🏗️', color: '#15803d',
+        topics: [
+          { name: 'Excel & Google Sheets',
+            why: 'Used in 90%+ of analyst roles — formulas, pivot tables, and charts are non-negotiable basics.',
+            concepts: ['VLOOKUP / XLOOKUP', 'Pivot Tables', 'Conditional Formatting', 'Basic Charts', 'Data Validation', 'IF / SUMIF / COUNTIF'],
+            resources: ['Excel Easy (exceljet.net)', 'Google Sheets crash course (YouTube)', 'Chandoo.org for advanced tricks'],
+            tools: ['Microsoft Excel', 'Google Sheets'] },
+          { name: 'SQL Fundamentals',
+            why: 'SQL is the single most important skill for a data analyst — every interview will test it.',
+            concepts: ['SELECT, WHERE, GROUP BY, ORDER BY', 'JOINs (INNER, LEFT, RIGHT, FULL)', 'Aggregations (COUNT, SUM, AVG)', 'Subqueries & CTEs', 'HAVING vs WHERE', 'Window functions (RANK, ROW_NUMBER, LAG)'],
+            resources: ['SQLZoo (free, interactive)', 'Mode Analytics SQL Tutorial', 'LeetCode SQL problems (easy first)', 'pgexercises.com'],
+            tools: ['PostgreSQL', 'MySQL', 'SQLite', 'DBeaver (GUI)'] },
+          { name: 'Statistics Basics',
+            why: 'You need to understand data distributions, central tendency, and correlation before claiming insights.',
+            concepts: ['Mean, Median, Mode, Std Dev', 'Normal distribution & Z-scores', 'Correlation vs Causation', 'Confidence intervals', 'P-value intuition', 'Sampling bias'],
+            resources: ['Khan Academy Statistics (free)', 'StatQuest YouTube (essential)', 'Seeing Theory (visual probability)'],
+            tools: ['Excel', 'Google Sheets'] },
+        ]
+      },
+      { name: 'Core Skills', duration: '6–8 weeks', icon: '⚡', color: '#0d7a86',
+        topics: [
+          { name: 'Python for Data Analysis',
+            why: 'Python with pandas is the industry standard for data wrangling and analysis at scale.',
+            concepts: ['pandas DataFrames (read_csv, merge, groupby, pivot)', 'NumPy arrays & operations', 'Data cleaning (nulls, dtypes, duplicates)', 'Exploratory Data Analysis (EDA)', 'matplotlib & seaborn for plotting', 'Jupyter notebooks workflow'],
+            resources: ['Kaggle Learn Python (free)', 'pandas documentation', '"Python for Data Analysis" by Wes McKinney', '100 pandas exercises (GitHub repo)'],
+            tools: ['Jupyter Notebook', 'VS Code', 'Google Colab (free)'] },
+          { name: 'Data Visualization',
+            why: 'A chart that misleads or confuses is worse than no chart. Good viz is a core analyst skill.',
+            concepts: ['Choosing the right chart type', 'Plotly & seaborn for Python', 'Tableau / Power BI basics', 'Dashboard design principles', 'Storytelling with data', 'KPIs and metrics selection'],
+            resources: ['Tableau Public (free)', 'Power BI Desktop (free)', '"Storytelling with Data" by Cole Knaflic', 'Data Visualization Society resources'],
+            tools: ['Tableau Public', 'Power BI Desktop', 'Plotly', 'seaborn'] },
+          { name: 'Advanced SQL',
+            why: 'Analysts who write complex SQL queries are far more productive — and more hireable.',
+            concepts: ['Complex JOINs across 3+ tables', 'CTEs and recursive queries', 'Window functions (running totals, percentile)', 'Query optimization & indexes', 'Stored procedures', 'Date/time functions'],
+            resources: ['Advanced SQL for Data Scientists (Mode)', 'LeetCode SQL (medium/hard)', '"Learning SQL" by Alan Beaulieu', 'StrataScratch SQL practice'],
+            tools: ['PostgreSQL', 'BigQuery (free tier)', 'Snowflake (trial)'] },
+        ]
+      },
+      { name: 'Job-Ready', duration: '4–6 weeks', icon: '🚀', color: '#7c3aed',
+        topics: [
+          { name: 'Business Acumen & Metrics',
+            why: 'Analysts who understand the business context of their data get promoted faster.',
+            concepts: ['North Star Metrics', 'Funnel analysis', 'Cohort analysis', 'A/B test interpretation', 'ROI calculation', 'OKR / AARRR frameworks'],
+            resources: ['Reforge blog articles', 'Stratechery (business + tech)', 'HBR Analytics articles'],
+            tools: ['Notion / Confluence', 'Miro for metric diagrams'] },
+          { name: 'Portfolio Projects',
+            why: 'A GitHub portfolio with 2–3 end-to-end projects beats a CV full of certifications.',
+            concepts: ['EDA on a real Kaggle dataset', 'SQL + Tableau dashboard project', 'Python data cleaning pipeline', 'README writing', 'Storytelling your findings'],
+            resources: ['Kaggle datasets', 'data.gov.in (India datasets)', 'Google Dataset Search', 'Maven Analytics playground'],
+            tools: ['GitHub', 'Kaggle', 'Google Colab'] },
+        ]
+      },
+    ],
+    tools: ['Python', 'SQL', 'Excel / Google Sheets', 'Tableau or Power BI', 'Jupyter Notebook', 'Git / GitHub'],
+    tips: ['Always be ready to walk through an EDA process for a dataset','Practice writing SQL queries by hand — no autocomplete in interviews','Prepare 2 business case studies where you derived insights from data','Know the difference between mean, median, and when to use each','Be ready to explain a chart you made and why you chose that type'],
+  },
+  {
+    id: 'scientist', emoji: '🔬', title: 'Data Scientist',
+    tagline: 'Build models that predict and explain',
+    color: '#7c3aed', bg: 'rgba(124,58,237,0.08)', border: 'rgba(124,58,237,0.3)',
+    timeline: '6–10 months', demand: 'High', demandColor: '#0d7a86', salary: '₹7–20 LPA',
+    desc: 'Data Scientists build predictive models and extract deep insights using statistics and machine learning. The natural progression from analyst.',
+    phases: [
+      { name: 'Solid Foundations', duration: '5–7 weeks', icon: '🏗️', color: '#15803d',
+        topics: [
+          { name: 'Python Mastery',
+            why: 'Python is the lingua franca of data science. You must be fluent, not just familiar.',
+            concepts: ['OOP in Python (classes, inheritance)', 'List comprehensions & generators', 'pandas advanced (multi-index, apply, pipe)', 'NumPy broadcasting', 'Decorators & context managers', 'Virtual environments & pip'],
+            resources: ['Fluent Python (book)', '"Python Tricks" by Dan Bader', 'Real Python (realpython.com)', 'Corey Schafer YouTube'],
+            tools: ['Python 3.11+', 'VS Code', 'Jupyter Lab', 'conda'] },
+          { name: 'Statistics & Probability',
+            why: 'Machine learning is applied statistics. Without this foundation you are cargo-cult-coding.',
+            concepts: ['Probability distributions (Gaussian, Binomial, Poisson)', 'Hypothesis testing (t-test, chi-square)', 'Bayesian thinking', 'Regression analysis', 'MLE and MAP estimation', 'Cross-validation'],
+            resources: ['StatQuest with Josh Starmer (YouTube — essential)', 'Think Stats by Allen Downey (free PDF)', 'Seeing Theory (interactive)'],
+            tools: ['scipy.stats', 'statsmodels', 'pingouin'] },
+          { name: 'Linear Algebra & Calculus Intuition',
+            why: 'You need to understand why gradient descent works and what a matrix decomposition means.',
+            concepts: ['Vectors, matrices, dot product', 'Eigenvalues & eigenvectors (PCA)', 'Gradients & partial derivatives', 'Chain rule (backprop foundation)', 'Matrix factorization basics'],
+            resources: ['3Blue1Brown "Essence of Linear Algebra" (YouTube — free)', '3Blue1Brown "Essence of Calculus"', '"Mathematics for ML" by Deisenroth (free PDF)'],
+            tools: ['NumPy for matrix ops'] },
+        ]
+      },
+      { name: 'Machine Learning Core', duration: '8–10 weeks', icon: '⚡', color: '#7c3aed',
+        topics: [
+          { name: 'Supervised Learning',
+            why: 'Bread and butter of applied ML — 70% of real projects use supervised learning.',
+            concepts: ['Linear & Logistic Regression (from scratch)', 'Decision Trees & Random Forest', 'Gradient Boosting (XGBoost, LightGBM)', 'SVMs', 'Evaluation metrics (precision, recall, F1, AUC-ROC)', 'Bias-Variance tradeoff'],
+            resources: ['scikit-learn User Guide', 'Hands-On ML by Aurélien Géron (best ML book)', 'fast.ai Practical DL (free)', 'StatQuest ML playlist'],
+            tools: ['scikit-learn', 'XGBoost', 'LightGBM', 'CatBoost'] },
+          { name: 'Unsupervised Learning',
+            why: 'Clustering and dimensionality reduction are essential for exploration and feature engineering.',
+            concepts: ['K-Means & DBSCAN clustering', 'PCA & t-SNE / UMAP', 'Anomaly detection', 'Hierarchical clustering', 'Association rules'],
+            resources: ['scikit-learn clustering docs', 'DataCamp unsupervised learning course', 'UMAP documentation'],
+            tools: ['scikit-learn', 'umap-learn', 'hdbscan'] },
+          { name: 'Feature Engineering & Evaluation',
+            why: 'Feature engineering wins more than algorithm choice — in Kaggle and industry alike.',
+            concepts: ['Encoding categoricals (target, frequency, one-hot)', 'Handling class imbalance (SMOTE)', 'Cross-validation (stratified k-fold)', 'Hyperparameter tuning (Optuna)', 'SHAP values for explainability'],
+            resources: ['Kaggle Learn feature engineering course', '"Feature Engineering for ML" by Alice Zheng', 'SHAP documentation'],
+            tools: ['scikit-learn Pipeline', 'Optuna', 'SHAP', 'imbalanced-learn'] },
+        ]
+      },
+      { name: 'Advanced & Deployment', duration: '5–7 weeks', icon: '🚀', color: '#b45309',
+        topics: [
+          { name: 'Deep Learning Fundamentals',
+            why: 'Neural networks power the most exciting applications — understand the basics.',
+            concepts: ['Feedforward networks (MLP)', 'CNNs for image data', 'RNNs / LSTMs for sequences', 'Transfer learning', 'Regularization (dropout, batch norm)', 'PyTorch fundamentals'],
+            resources: ['fast.ai Practical Deep Learning (free & excellent)', 'Deep Learning Specialization — Andrew Ng', 'Andrej Karpathy YouTube (zero to hero)', 'd2l.ai (free book)'],
+            tools: ['PyTorch', 'TensorFlow/Keras', 'Hugging Face'] },
+          { name: 'MLOps Basics & Deployment',
+            why: 'A model stuck in Jupyter has zero business value. You must know how to ship it.',
+            concepts: ['MLflow for experiment tracking', 'Building REST APIs with FastAPI', 'Docker basics', 'Model versioning', 'Streamlit for demo apps'],
+            resources: ['MLflow documentation', 'FastAPI documentation', 'Docker in 100 Seconds (Fireship)', 'Streamlit docs'],
+            tools: ['MLflow', 'FastAPI', 'Docker', 'Streamlit'] },
+        ]
+      },
+    ],
+    tools: ['Python', 'scikit-learn', 'XGBoost / LightGBM', 'PyTorch', 'MLflow', 'FastAPI', 'SQL', 'Git / GitHub'],
+    tips: ['Explain bias-variance tradeoff with a concrete example — asked in almost every DS interview','Know when NOT to use a neural network (tabular data often prefers gradient boosting)','Code logistic regression and a simple decision tree from scratch','Know your metrics cold — what does AUC-ROC actually measure?','Have a Kaggle project or competition result to discuss'],
+  },
+  {
+    id: 'engineer', emoji: '⚙️', title: 'Data Engineer',
+    tagline: 'Build the pipelines that power data teams',
+    color: '#b45309', bg: 'rgba(180,83,9,0.08)', border: 'rgba(180,83,9,0.3)',
+    timeline: '6–9 months', demand: 'Very High', demandColor: '#15803d', salary: '₹8–25 LPA',
+    desc: 'Data Engineers design and maintain the infrastructure that moves, stores, and transforms data at scale. Currently the highest-demand role in the data ecosystem.',
+    phases: [
+      { name: 'Programming & DB Foundations', duration: '5–7 weeks', icon: '🏗️', color: '#15803d',
+        topics: [
+          { name: 'Python Engineering',
+            why: 'Data engineering is 70% Python — you need production-quality, not notebook-quality code.',
+            concepts: ['File I/O and error handling', 'Working with APIs (requests, httpx)', 'Async programming (asyncio)', 'Type hints & dataclasses', 'Unit testing with pytest', 'Packaging and modules'],
+            resources: ['Real Python (realpython.com)', '"Clean Code" by Robert Martin', 'Python Testing with pytest', 'Corey Schafer YouTube'],
+            tools: ['Python 3.11+', 'VS Code', 'pytest', 'black / ruff'] },
+          { name: 'Advanced SQL & DB Design',
+            why: 'You will write and optimize SQL that handles millions of rows every day.',
+            concepts: ['Schema design (star schema, snowflake schema)', 'Indexing strategies', 'Transactions & ACID properties', 'Query execution plans (EXPLAIN ANALYZE)', 'SCD, fact/dimension tables'],
+            resources: ['pgexercises.com', '"Designing Data-Intensive Applications" ch 2–3', 'Use-the-index-luke.com'],
+            tools: ['PostgreSQL', 'DBeaver', 'pgAdmin'] },
+        ]
+      },
+      { name: 'Data Engineering Stack', duration: '8–10 weeks', icon: '⚡', color: '#0d7a86',
+        topics: [
+          { name: 'Pipeline Orchestration — Airflow',
+            why: 'Apache Airflow is the industry standard for scheduling and monitoring data pipelines.',
+            concepts: ['DAG structure and operators', 'Task dependencies and triggers', 'Scheduling with cron expressions', 'Error handling and retries', 'XComs for data passing'],
+            resources: ['Apache Airflow official docs', 'Marc Lamberti Airflow courses', 'Astronomer tutorials (free)'],
+            tools: ['Apache Airflow', 'Docker (for local Airflow)', 'Astronomer CLI'] },
+          { name: 'Apache Spark & Distributed Processing',
+            why: 'When data is too big for pandas, you need Spark. It is in almost every DE job description.',
+            concepts: ['RDDs vs DataFrames vs Datasets', 'Spark SQL', 'PySpark transformations & actions', 'Partitioning strategy', 'Spark optimization (caching, broadcasting)'],
+            resources: ['Spark: The Definitive Guide (O\'Reilly)', 'PySpark docs', 'Databricks Community Edition (free Spark cluster)'],
+            tools: ['PySpark', 'Databricks Community Edition', 'Spark UI'] },
+          { name: 'Cloud Data Platforms',
+            why: 'All modern data engineering happens in the cloud — AWS, GCP or Azure is essential.',
+            concepts: ['Cloud storage (S3, GCS, ADLS)', 'Managed warehouses (BigQuery, Redshift, Snowflake)', 'Serverless ETL functions', 'IAM & permissions', 'Cost management basics'],
+            resources: ['AWS Free Tier (12 months)', 'Google Cloud Skills Boost (free credits)', 'Snowflake 30-day trial'],
+            tools: ['AWS S3 + Glue / GCP BigQuery', 'Snowflake or Redshift', 'Terraform basics'] },
+          { name: 'dbt (Data Build Tool)',
+            why: 'dbt is now the standard for SQL-based data transformation — it is everywhere in modern stacks.',
+            concepts: ['Models, seeds, and sources', 'Jinja templating in SQL', 'Tests and documentation', 'dbt lineage graph', 'Incremental models'],
+            resources: ['dbt Learn (courses.getdbt.com — free)', 'dbt documentation', 'dbt Slack community'],
+            tools: ['dbt Core (open source)', 'dbt Cloud (free dev tier)'] },
+        ]
+      },
+      { name: 'Production & Scale', duration: '4–6 weeks', icon: '🚀', color: '#7c3aed',
+        topics: [
+          { name: 'Streaming Data — Kafka',
+            why: 'Real-time pipelines are increasingly common — Kafka is the undisputed leader.',
+            concepts: ['Topics, partitions, consumers, producers', 'Consumer groups and offsets', 'Kafka Connect for sources/sinks', 'Schema Registry and Avro', 'Exactly-once semantics'],
+            resources: ['Confluent Kafka tutorial (free)', 'Kafka: The Definitive Guide (free PDF)', 'Conduktor Kafka courses (YouTube)'],
+            tools: ['Apache Kafka', 'Confluent Cloud (free tier)', 'Kafka UI'] },
+          { name: 'Data Quality & Observability',
+            why: 'Bad data costs companies millions. Engineers who prevent that are invaluable.',
+            concepts: ['Great Expectations for data validation', 'Data lineage tracking', 'SLA monitoring', 'Schema evolution strategies', 'Alerting on pipeline failures'],
+            resources: ['Great Expectations documentation', 'Monte Carlo data observability blog'],
+            tools: ['Great Expectations', 'dbt tests', 'PagerDuty (alerting)'] },
+        ]
+      },
+    ],
+    tools: ['Python', 'SQL', 'Apache Airflow', 'Apache Spark / PySpark', 'dbt', 'Apache Kafka', 'AWS / GCP / Azure', 'Docker', 'Git / GitHub'],
+    tips: ['Design a full ETL pipeline on a whiteboard — sources, transforms, destinations','Understand batch vs streaming and when to use each','Know star schema vs snowflake schema and the query performance tradeoffs','Explain idempotency in pipelines — why it matters and how to achieve it','Debug a slow SQL query live using EXPLAIN ANALYZE'],
+  },
+  {
+    id: 'mlengineer', emoji: '🤖', title: 'ML Engineer',
+    tagline: 'Deploy and scale machine learning systems',
+    color: '#b91c1c', bg: 'rgba(185,28,28,0.08)', border: 'rgba(185,28,28,0.3)',
+    timeline: '8–12 months', demand: 'High', demandColor: '#0d7a86', salary: '₹12–30 LPA',
+    desc: 'ML Engineers sit at the intersection of software engineering and data science — they build systems that serve ML models in production reliably at scale.',
+    phases: [
+      { name: 'Software Engineering Essentials', duration: '6–8 weeks', icon: '🏗️', color: '#15803d',
+        topics: [
+          { name: 'Production-Grade Python',
+            why: 'MLE code runs in production 24/7 — you need software engineering discipline, not data science scripts.',
+            concepts: ['Design patterns (Factory, Strategy)', 'Type hints everywhere (mypy)', 'Exception handling and logging', 'Configuration management (pydantic)', 'Unit + integration tests', 'CI/CD with GitHub Actions'],
+            resources: ['Architecture Patterns with Python (O\'Reilly)', 'Effective Python by Brett Slatkin', 'testdriven.io'],
+            tools: ['Python 3.11+', 'pydantic', 'mypy', 'pytest', 'ruff'] },
+          { name: 'ML Fundamentals (for Engineers)',
+            why: 'You don\'t need to invent algorithms but must understand how they work under the hood.',
+            concepts: ['Gradient descent variants (Adam, SGD, RMSProp)', 'Regularization (L1/L2, dropout)', 'Common architectures (MLP, CNN, RNN, Transformer)', 'Loss functions and their gradients', 'Numerical stability issues'],
+            resources: ['CS231n Stanford notes (free)', 'Andrej Karpathy YouTube (zero to hero)', 'fast.ai courses (free)'],
+            tools: ['PyTorch', 'TensorFlow/Keras', 'scikit-learn'] },
+        ]
+      },
+      { name: 'MLOps Core', duration: '8–10 weeks', icon: '⚡', color: '#b91c1c',
+        topics: [
+          { name: 'Model Serving & APIs',
+            why: 'A model must be accessible via API to create value — this is table stakes for any MLE.',
+            concepts: ['REST API design with FastAPI', 'Async endpoints for inference', 'Batch vs real-time serving', 'gRPC for low-latency serving', 'Model versioning in APIs'],
+            resources: ['FastAPI documentation', 'Designing ML Systems by Chip Huyen', 'Chip Huyen\'s MLOps course (free on GitHub)'],
+            tools: ['FastAPI', 'BentoML', 'TorchServe', 'ONNX Runtime'] },
+          { name: 'Containerisation & Orchestration',
+            why: 'Every production ML system runs in containers — Docker and Kubernetes are non-negotiable.',
+            concepts: ['Dockerfile and image layers', 'Multi-stage builds for ML images', 'Docker Compose for local dev', 'Kubernetes fundamentals (pods, deployments)', 'Helm charts basics', 'Resource limits and auto-scaling'],
+            resources: ['Docker official getting started', '"Kubernetes in Action" by Marko Luksa', 'Nana Techworld YouTube (K8s)'],
+            tools: ['Docker', 'Kubernetes (minikube locally)', 'Helm', 'k9s CLI'] },
+          { name: 'Experiment Tracking & Model Registry',
+            why: 'Without systematic experiment tracking you are flying blind in ML development.',
+            concepts: ['MLflow tracking server setup', 'Logging params, metrics, artifacts', 'Model registry and stage transitions', 'Weights & Biases sweeps', 'Reproducibility (seeds, env locks)'],
+            resources: ['MLflow documentation', 'Weights & Biases documentation', 'W&B 100 Days of ML (YouTube)'],
+            tools: ['MLflow', 'Weights & Biases', 'DVC'] },
+        ]
+      },
+      { name: 'Production & Monitoring', duration: '4–6 weeks', icon: '🚀', color: '#7c3aed',
+        topics: [
+          { name: 'Model Monitoring & Drift Detection',
+            why: 'Models degrade silently in production — catching this before users notice is the MLE\'s job.',
+            concepts: ['Data drift vs concept drift', 'Statistical tests for drift (PSI, KS-test)', 'Evidently for ML monitoring', 'Prometheus + Grafana for metrics', 'Shadow mode / canary deployments'],
+            resources: ['Evidently AI documentation', 'Prometheus getting started', 'MLOps Community YouTube'],
+            tools: ['Evidently AI', 'Prometheus', 'Grafana', 'Seldon Alibi Detect'] },
+          { name: 'Cloud ML Platforms',
+            why: 'Production ML is deployed on cloud — you must know at least one end to end.',
+            concepts: ['AWS SageMaker or GCP Vertex AI', 'Managed training jobs', 'Endpoint deployment and auto-scaling', 'Batch transform jobs', 'Cost optimization strategies'],
+            resources: ['AWS SageMaker Studio (free tier)', 'GCP Vertex AI documentation', 'A Cloud Guru ML courses'],
+            tools: ['AWS SageMaker / GCP Vertex AI', 'Kubeflow', 'Metaflow'] },
+        ]
+      },
+    ],
+    tools: ['Python', 'PyTorch / TensorFlow', 'FastAPI', 'Docker', 'Kubernetes', 'MLflow', 'AWS / GCP', 'Prometheus / Grafana'],
+    tips: ['Design a production ML system end-to-end: feature pipelines → training → serving → monitoring','Know online vs offline serving latency requirements','Explain how you would detect and respond to model drift in production','Have experience containerising and deploying at least one real model','Understand the CAP theorem and how it applies to feature stores'],
+  },
+  {
+    id: 'bi', emoji: '📈', title: 'BI Analyst',
+    tagline: 'Deliver self-service analytics across the business',
+    color: '#0369a1', bg: 'rgba(3,105,161,0.08)', border: 'rgba(3,105,161,0.3)',
+    timeline: '3–5 months', demand: 'Very High', demandColor: '#15803d', salary: '₹4–12 LPA',
+    desc: 'Business Intelligence Analysts build dashboards and reports that give stakeholders self-service access to data insights. The fastest route to employment from an MSc Data Science background.',
+    phases: [
+      { name: 'Core BI Tools', duration: '5–7 weeks', icon: '🏗️', color: '#15803d',
+        topics: [
+          { name: 'Power BI (Recommended)',
+            why: 'Power BI is the #1 BI tool by market share — appears in more Indian job postings than any other.',
+            concepts: ['Power BI Desktop layout and workflow', 'Connecting to data sources', 'Power Query (M language basics)', 'Data modeling (relationships, calculated columns)', 'DAX formulas (CALCULATE, FILTER, ALL, SUMX)', 'Report design and interactivity'],
+            resources: ['Microsoft Learn Power BI (free, official)', 'Guy in a Cube YouTube (Power BI, free)', 'SQLBI.com (DAX deep dives)', 'Power BI Community Forum'],
+            tools: ['Power BI Desktop (free)', 'Power BI Service (free personal)'] },
+          { name: 'Tableau (Alternative)',
+            why: 'Tableau is preferred in larger enterprises — stronger for complex and exploratory visuals.',
+            concepts: ['Connecting to data and data prep', 'Dimensions vs Measures', 'Calculated fields and LOD expressions', 'Dashboard design and actions', 'Table calculations', 'Publishing to Tableau Public'],
+            resources: ['Tableau training videos (help.tableau.com, free)', 'Tableau Public gallery for inspiration', 'SuperDataScience Tableau course'],
+            tools: ['Tableau Public (free)', 'Tableau Desktop (student license available)'] },
+          { name: 'SQL for BI',
+            why: 'BI analysts query databases directly — strong SQL lets you build better reports faster.',
+            concepts: ['Complex aggregations for dashboards', 'Window functions for running totals', 'CTEs for readable queries', 'Date spine queries for time series', 'Semi-additive measures'],
+            resources: ['Mode Analytics SQL Tutorial', 'StrataScratch SQL problems', 'LeetCode SQL (medium level)'],
+            tools: ['PostgreSQL', 'BigQuery', 'SQL Server (SSMS)'] },
+        ]
+      },
+      { name: 'Data Modeling & Design', duration: '4–5 weeks', icon: '⚡', color: '#0369a1',
+        topics: [
+          { name: 'DAX & Advanced Power BI',
+            why: 'DAX fluency separates junior from senior BI analysts — it is the core differentiator.',
+            concepts: ['Row context vs filter context (most important concept in DAX)', 'CALCULATE and its filter magic', 'Time intelligence functions', 'RANKX, TOPN, SUMMARIZE', 'Variables in DAX (VAR)', 'Performance optimization'],
+            resources: ['SQLBI DAX Patterns (daxpatterns.com — free)', '"Definitive Guide to DAX" by Ferrari & Russo', 'SQLBI YouTube', 'Curbal YouTube', 'DAX Studio (free debugging tool)'],
+            tools: ['Power BI Desktop', 'DAX Studio (free)'] },
+          { name: 'Dashboard Design Principles',
+            why: 'A technically correct dashboard that nobody can read has zero value.',
+            concepts: ['Information hierarchy', 'Color theory for data (sequential, diverging, categorical)', 'Gestalt principles', 'Mobile-first considerations', 'Accessibility in dashboards', 'Stakeholder requirements gathering'],
+            resources: ['"Storytelling with Data" by Cole Knaflic (essential)', '"The Big Book of Dashboards" by Wexler et al.', 'Figma for wireframing'],
+            tools: ['Figma (free tier)', 'Coolors.co for color palettes'] },
+        ]
+      },
+      { name: 'Business & Portfolio', duration: '3–4 weeks', icon: '🚀', color: '#7c3aed',
+        topics: [
+          { name: 'Excel + Power Query Mastery',
+            why: 'Many BI environments still revolve around Excel — Power Query makes it powerful at scale.',
+            concepts: ['Power Query data transformation', 'M language for custom transforms', 'Power Pivot (Excel data model)', 'Dynamic array formulas (SPILL)', 'VBA basics for automation'],
+            resources: ['Excel Off The Grid YouTube', 'Excel Campus tutorials', 'Mr. Excel community forums'],
+            tools: ['Microsoft Excel 365', 'Power Query Editor'] },
+          { name: 'Portfolio & Certification',
+            why: 'PL-300 (Power BI cert) + a public dashboard portfolio will get your CV shortlisted.',
+            concepts: ['Build 2 end-to-end dashboards with real data', 'Publish to Tableau Public or Power BI web', 'Document business questions answered', 'Get PL-300 certified (Power BI)'],
+            resources: ['Microsoft Learn free study paths for PL-300', 'Kaggle datasets', 'data.gov.in for India datasets', 'Maven Analytics playground'],
+            tools: ['Power BI Service', 'Tableau Public', 'LinkedIn to showcase work'] },
+        ]
+      },
+    ],
+    tools: ['Power BI', 'Tableau', 'SQL', 'Excel / Power Query', 'DAX', 'Python (basic pandas)'],
+    tips: ['Always bring a portfolio link — Tableau Public or a published Power BI report','Walk through how you would design a sales dashboard from scratch','Explain filter context vs row context in DAX for Power BI roles','Know at least 5 chart types and when NOT to use them','Prepare to discuss a time your dashboard drove a business decision'],
+  },
+  {
+    id: 'llm', emoji: '🧠', title: 'AI / LLM Engineer',
+    tagline: 'Build intelligent apps powered by large language models',
+    color: '#0d7a86', bg: 'rgba(13,122,134,0.08)', border: 'rgba(13,122,134,0.3)',
+    timeline: '5–8 months', demand: 'Explosive 🔥', demandColor: '#b91c1c', salary: '₹12–40 LPA',
+    desc: 'AI/LLM Engineers build applications powered by large language models — chatbots, RAG systems, agents, and AI-powered workflows. The hottest and fastest-growing role in tech.',
+    phases: [
+      { name: 'Python & ML Foundations', duration: '4–5 weeks', icon: '🏗️', color: '#15803d',
+        topics: [
+          { name: 'Python for AI Engineering',
+            why: 'LLM application code is Python — you need async, typing, and API patterns specifically.',
+            concepts: ['Async / await patterns', 'Pydantic for data validation', 'Environment management (.env)', 'Working with REST APIs', 'Type hints and dataclasses'],
+            resources: ['Real Python async tutorials', 'Pydantic documentation', 'FastAPI tutorial (teaches async Python naturally)'],
+            tools: ['Python 3.11+', 'VS Code', 'uv (fast package manager)'] },
+          { name: 'NLP & Transformer Foundations',
+            why: 'You cannot build good LLM apps without understanding tokenization, embeddings, and attention.',
+            concepts: ['Tokenization and vocabulary', 'Word embeddings → contextual embeddings', 'Attention mechanism intuition', 'BERT, GPT architecture overview', 'Semantic similarity and cosine distance', 'Context window and tokens'],
+            resources: ['The Illustrated Transformer by Jay Alammar (free blog)', 'Hugging Face NLP Course (free)', 'Andrej Karpathy "Let\'s build GPT" YouTube', '3Blue1Brown Attention video'],
+            tools: ['Hugging Face Transformers', 'sentence-transformers'] },
+        ]
+      },
+      { name: 'LLM Application Stack', duration: '7–9 weeks', icon: '⚡', color: '#0d7a86',
+        topics: [
+          { name: 'Prompt Engineering',
+            why: 'The cheapest way to improve an LLM application is better prompts — this is a real skill.',
+            concepts: ['Zero-shot vs few-shot prompting', 'Chain-of-Thought (CoT)', 'Self-consistency technique', 'Role and persona prompting', 'Output format enforcement (JSON mode)', 'System vs user vs assistant messages'],
+            resources: ['Prompt Engineering Guide (promptingguide.ai — free)', 'OpenAI Prompt Engineering Guide', 'LLM Bootcamp by FSDL (free YouTube)'],
+            tools: ['OpenAI Playground', 'Anthropic Console', 'PromptLayer'] },
+          { name: 'RAG — Retrieval-Augmented Generation',
+            why: 'RAG is the most widely deployed LLM pattern in production — essential for any AI engineer.',
+            concepts: ['Chunking strategies (fixed, recursive, semantic)', 'Embedding models (text-embedding-3-small)', 'Vector databases (Pinecone, Qdrant, Chroma)', 'Similarity search (cosine, dot product)', 'Context construction and retrieval quality', 'Reranking (Cohere Rerank, BM25 hybrid)'],
+            resources: ['LangChain RAG tutorial', 'LlamaIndex documentation', 'Qdrant vector DB documentation'],
+            tools: ['LangChain / LlamaIndex', 'ChromaDB (local)', 'Pinecone / Qdrant (cloud)'] },
+          { name: 'LLM Frameworks',
+            why: 'Frameworks like LangChain / LlamaIndex handle the plumbing — you build on top of them.',
+            concepts: ['LangChain chains and LCEL', 'LangGraph for agentic workflows', 'Memory management in conversations', 'Tool calling (function calling)', 'Streaming responses'],
+            resources: ['LangChain Python docs', 'LlamaIndex documentation', 'LangGraph tutorials'],
+            tools: ['LangChain', 'LlamaIndex', 'LangGraph', 'LangSmith'] },
+          { name: 'LLM Agents',
+            why: 'Agents automate multi-step reasoning with tool use — the future of AI applications.',
+            concepts: ['ReAct pattern (Reasoning + Acting)', 'Tool definition and registration', 'Planning and memory patterns', 'Multi-agent orchestration', 'Human-in-the-loop checkpoints'],
+            resources: ['LangGraph agent tutorials', 'AutoGen documentation (Microsoft)', 'CrewAI documentation', '"The AI Engineer" newsletter'],
+            tools: ['LangGraph', 'AutoGen', 'CrewAI'] },
+        ]
+      },
+      { name: 'Fine-tuning & Production', duration: '4–6 weeks', icon: '🚀', color: '#7c3aed',
+        topics: [
+          { name: 'Fine-Tuning & PEFT',
+            why: 'Fine-tuning customizes a model for your domain — LoRA makes it affordable.',
+            concepts: ['Full fine-tuning vs LoRA / QLoRA', 'Instruction tuning format', 'PEFT library from Hugging Face', 'Datasets for fine-tuning (JSONL format)', 'Quantization (4-bit with bitsandbytes)'],
+            resources: ['Hugging Face PEFT documentation', 'Sebastian Raschka\'s LoRA explainer (free PDF)', '"Fine-Tuning LLMs" by Shaw Talebi (YouTube)'],
+            tools: ['Hugging Face PEFT', 'Axolotl', 'Unsloth (fast LoRA)', 'bitsandbytes'] },
+          { name: 'LLM Evaluation & Guardrails',
+            why: 'Production LLM apps must be reliable — hallucination and safety failures destroy trust.',
+            concepts: ['RAGAS framework for RAG evaluation', 'LLM-as-judge pattern', 'Guardrails for output validation', 'Latency optimization (streaming, caching)', 'Cost tracking and optimization'],
+            resources: ['RAGAS documentation (ragas.io)', 'Guardrails AI documentation', 'LangSmith evaluation docs'],
+            tools: ['RAGAS', 'Guardrails AI', 'LangSmith', 'Promptfoo'] },
+        ]
+      },
+    ],
+    tools: ['Python', 'LangChain / LlamaIndex', 'OpenAI / Anthropic API', 'Vector DB (Qdrant / Pinecone)', 'FastAPI', 'Docker', 'Hugging Face', 'LangSmith'],
+    tips: ['Build and demo a working RAG app — nothing beats a live demo in an AI engineering interview','Explain the difference between semantic search and keyword search, and when to combine them','Know the tradeoffs: fine-tuning vs RAG vs prompt engineering for a given problem','Understand token economics — how to reduce cost and latency in production','Discuss hallucination: how to detect it and reduce it in your system'],
+  },
+];
+
+// ── RENDER ──────────────────────────────────────────────────────────────────
+
+function renderGrid() {
+  const grid = document.getElementById('role-grid');
+  grid.innerHTML = ROLES.map(r => `
+    <button class="role-card" onclick="showRole('${r.id}')"
+      style="border-color:${r.border}; background:${r.bg};"
+      onmouseenter="this.style.borderColor='${r.color}'"
+      onmouseleave="this.style.borderColor='${r.border}'">
+      <div class="role-header">
+        <div class="role-emoji">${r.emoji}</div>
+        <div>
+          <div class="role-title" style="color:${r.color}">${r.title}</div>
+          <div class="role-tagline">${r.tagline}</div>
+        </div>
+      </div>
+      <div class="role-desc">${r.desc.slice(0, 110)}…</div>
+      <div class="role-footer">
+        <div class="role-chips">
+          <span class="chip" style="background:${r.bg};color:${r.color};border-color:${r.color}44">⏱ ${r.timeline}</span>
+          <span class="chip chip-grey">${r.salary}</span>
+        </div>
+        <div class="role-cta" style="color:${r.color}">View Roadmap →</div>
+      </div>
+    </button>
+  `).join('');
+}
+
+function renderRole(role) {
+  const phasesHtml = role.phases.map((ph, pi) => `
+    <div class="phase-section">
+      <button class="phase-toggle ${pi === 0 ? 'open' : ''}" onclick="togglePhase(this)"
+        style="border-color:${pi===0?ph.color:'var(--border)'}; background:${pi===0?ph.color+'12':'var(--surface)'};">
+        <span class="phase-icon">${ph.icon}</span>
+        <div class="phase-meta">
+          <div class="phase-name-row">
+            <span class="phase-name" style="color:${pi===0?ph.color:'var(--text)'}"
+              data-color="${ph.color}">Phase ${pi+1}: ${ph.name}</span>
+            <span class="phase-duration" style="background:${ph.color}14;color:${ph.color};border-color:${ph.color}33">
+              ⏱ ${ph.duration}
+            </span>
+          </div>
+          <div class="phase-sub">${ph.topics.length} topic${ph.topics.length>1?'s':''} — click to expand/collapse</div>
+        </div>
+        <span class="phase-chevron" data-open="${pi===0}">${pi===0?'▲':'▼'}</span>
+      </button>
+      <div class="phase-body ${pi===0?'open':''}" style="border-color:${ph.color}40">
+        ${ph.topics.map((t,ti) => renderTopic(t, ph.color, ti)).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  const toolsHtml = role.tools.map(t =>
+    `<span class="tool-tag" style="background:${role.color}12;color:${role.color};border-color:${role.color}35">${t}</span>`
+  ).join('');
+
+  const tipsHtml = role.tips.map((tip, i) => `
+    <div class="tip-row">
+      <div class="tip-num" style="background:${role.color}15;color:${role.color}">${i+1}</div>
+      <div class="tip-text">${tip}</div>
+    </div>
+  `).join('');
+
+  return `
+    <button class="back-btn" onclick="showGrid()">← Back to all roles</button>
+
+    <div class="detail-header" style="background:linear-gradient(135deg,${role.color}22,${role.color}08);border-color:${role.color}44">
+      <div class="detail-top">
+        <div class="detail-emoji">${role.emoji}</div>
+        <div class="detail-info">
+          <div class="detail-title" style="color:${role.color}">${role.title}</div>
+          <div class="detail-tagline">${role.tagline}</div>
+          <div class="detail-desc">${role.desc}</div>
+          <div class="detail-stats">
+            <div class="detail-stat">
+              <div class="detail-stat-label">⏱️ Timeline</div>
+              <div class="detail-stat-value">${role.timeline}</div>
+            </div>
+            <div class="detail-stat">
+              <div class="detail-stat-label">💼 Demand</div>
+              <div class="detail-stat-value" style="color:${role.demandColor}">${role.demand}</div>
+            </div>
+            <div class="detail-stat">
+              <div class="detail-stat-label">💰 Avg Salary</div>
+              <div class="detail-stat-value">${role.salary}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">📈 Learning Roadmap</div>
+    ${phasesHtml}
+
+    <div class="info-card">
+      <div class="info-card-title" style="color:${role.color}">🔧 Must-Know Tools & Technologies</div>
+      <div class="tools-row">${toolsHtml}</div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-title" style="color:${role.color}">💡 Interview Tips</div>
+      <div class="tips-list">${tipsHtml}</div>
+    </div>
+  `;
+}
+
+function renderTopic(t, color, idx) {
+  const concepts = t.concepts.map(c => `
+    <div class="item-row">
+      <span class="item-dot" style="color:${color}">✓</span>
+      <span class="item-text">${c}</span>
+    </div>`).join('');
+
+  const resources = t.resources.map(r => `
+    <div class="item-row">
+      <span class="item-dot" style="color:${color}">›</span>
+      <span class="item-text">${r}</span>
+    </div>`).join('');
+
+  const tools = t.tools.map(tl =>
+    `<span class="tool-tag" style="background:${color}12;color:${color};border-color:${color}33">${tl}</span>`
+  ).join('');
+
+  return `
+    <div class="topic-card" style="--tc:${color}">
+      <button class="topic-toggle" onclick="toggleTopic(this)">
+        <div class="topic-num" style="background:${color}18;color:${color}">${idx+1}</div>
+        <div class="topic-title">${t.name}</div>
+        <span class="topic-chevron" style="color:var(--muted)">▼</span>
+      </button>
+      <div class="topic-body">
+        <div class="why-box" style="background:${color}0d">
+          <div class="why-label" style="color:${color}">Why this matters</div>
+          <div class="why-text">${t.why}</div>
+        </div>
+        <div class="topic-cols">
+          <div>
+            <div class="topic-col-title">🎯 Key Concepts</div>
+            ${concepts}
+          </div>
+          <div>
+            <div class="topic-col-title">📚 Free Resources</div>
+            ${resources}
+            <div style="margin-top:12px">
+              <div class="topic-col-title">🔧 Tools</div>
+              <div class="tool-tags">${tools}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── INTERACTIONS ─────────────────────────────────────────────────────────────
+
+function togglePhase(btn) {
+  const body = btn.nextElementSibling;
+  const chevron = btn.querySelector('.phase-chevron');
+  const nameel = btn.querySelector('.phase-name');
+  const isOpen = body.classList.contains('open');
+  const color = nameel.dataset.color;
+
+  if (isOpen) {
+    body.classList.remove('open');
+    btn.classList.remove('open');
+    btn.style.borderColor = 'var(--border)';
+    btn.style.background = 'var(--surface)';
+    btn.style.boxShadow = 'var(--shadow)';
+    nameel.style.color = 'var(--text)';
+    chevron.textContent = '▼';
+  } else {
+    body.classList.add('open');
+    btn.classList.add('open');
+    btn.style.borderColor = color;
+    btn.style.background = color + '12';
+    btn.style.boxShadow = '0 4px 20px ' + color + '20';
+    nameel.style.color = color;
+    chevron.textContent = '▲';
+  }
+}
+
+function toggleTopic(btn) {
+  const card = btn.closest('.topic-card');
+  const body = card.querySelector('.topic-body');
+  const chevron = btn.querySelector('.topic-chevron');
+  const color = getComputedStyle(card).getPropertyValue('--tc').trim();
+  const isOpen = body.classList.contains('open');
+
+  if (isOpen) {
+    body.classList.remove('open');
+    card.style.borderColor = 'var(--border)';
+    card.style.boxShadow = 'var(--shadow)';
+    btn.style.background = 'var(--surface)';
+    chevron.style.color = 'var(--muted)';
+    chevron.textContent = '▼';
+  } else {
+    body.classList.add('open');
+    card.style.borderColor = color;
+    card.style.boxShadow = '0 4px 20px ' + color + '22';
+    btn.style.background = color + '0d';
+    chevron.style.color = color;
+    chevron.textContent = '▲';
+  }
+}
+
+function showRole(id) {
+  const role = ROLES.find(r => r.id === id);
+  document.getElementById('grid-view').style.display = 'none';
+  const detail = document.getElementById('detail');
+  detail.style.display = 'block';
+  detail.innerHTML = renderRole(role);
+  window.scrollTo(0, 0);
+}
+
+function showGrid() {
+  document.getElementById('detail').style.display = 'none';
+  document.getElementById('grid-view').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+renderGrid();
+</script>
+
+</body>
+</html>
