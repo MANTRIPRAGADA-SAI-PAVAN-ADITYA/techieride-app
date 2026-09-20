@@ -149,7 +149,7 @@ export default function App() {
               <Routes>
                 <Route path="/"           element={<Landing onLoginClick={() => setMode('login')} />} />
                 <Route path="/activities" element={<PublicActivities />} />
-                <Route path="/register"   element={<Register />} />
+<Route path="/register"   element={<Register />} />
                 <Route path="/donate"     element={<Donate />} />
                 <Route path="*"           element={<Navigate to="/" replace />} />
               </Routes>
